@@ -12,19 +12,19 @@ If you run into trouble using any part of the HPC, heres an order of where to lo
 
 # Contents
 
-**[VPN access and requesting an account](https://github.com/ollieeknight/bih-cubi/tree/main?tab=readme-ov-file#vpn-access-and-requesting-an-account)**  
-**[Connecting to the cluster](https://github.com/ollieeknight/bih-cubi/tree/main?tab=readme-ov-file#vpn-access-and-requesting-an-account)**  
-**[Setting up your work environment](https://github.com/ollieeknight/bih-cubi/tree/main?tab=readme-ov-file#vpn-access-and-requesting-an-account)**  
-**[Setting up an RStudio session](https://github.com/ollieeknight/bih-cubi/tree/main?tab=readme-ov-file#vpn-access-and-requesting-an-account)**  
+**[VPN access and requesting an account](https://github.com/ollieeknight/bih-cubi-romagnani?tab=readme-ov-file#vpn-access-and-requesting-an-account)**  
+**[Connecting to the cluster](https://github.com/ollieeknight/bih-cubi-romagnani?tab=readme-ov-file#connecting-to-the-cluster)**  
+**[Setting up your work environment](https://github.com/ollieeknight/bih-cubi-romagnani?tab=readme-ov-file#setting-up-your-work-environment)**  
+**[Setting up an RStudio session](https://github.com/ollieeknight/bih-cubi-romagnani?tab=readme-ov-file#setting-up-an-rstudio-session)**  
 
 
 # VPN access and requesting an account
 
-1. **Fill in both VPN forms, [`vpn_antrag.pdf`](https://github.com/romagnanilab/bih-cubi/blob/main/files/01_VPN_antrag.pdf), and [`vpn_zusatzantrag_b.pdf`](https://github.com/romagnanilab/bih-cubi/blob/main/files/02_VPN_zusatzantrag_B.pdf)**  
+1. **Fill in both VPN forms, [`vpn_antrag.pdf`](https://github.com/romagnanilab/bih-cubi-romagnani/blob/main/files/01_VPN_antrag.pdf), and [`vpn_zusatzantrag_b.pdf`](https://github.com/romagnanilab/bih-cubi-romagnani/blob/main/files/02_VPN_zusatzantrag_B.pdf)**  
 Print and sign both, then scan and send both files to to *vpn@charite.de*, cc'ing Chiara (*chiara.romagnani@charite.de*).
 
 2. **For personal computer access, install OpenVPN and configure your connection**  
-Refer to either installation on macOS ([`vpn_macOS_installation.pdf`](https://github.com/romagnanilab/bih-cubi/blob/main/files/install_VPN_macOS.pdf)) or Windows ([`vpn_Windows_installation.pdf`](https://github.com/romagnanilab/bih-cubi/blob/main/files/install_VPN_windows.pdf)) if you run into trouble.
+Refer to either installation on macOS ([`vpn_macOS_installation.pdf`](https://github.com/romagnanilab/bih-cubi-romagnani/blob/main/files/install_VPN_macOS.pdf)) or Windows ([`vpn_Windows_installation.pdf`](https://github.com/romagnanilab/bih-cubi-romagnani/blob/main/files/install_VPN_windows.pdf)) if you run into trouble.
 
 If you have any issues, feel free to ask Ollie (*oliver.knight@charite.de*) for help. You can also check out the BIH-CUBI cluster guide [here](https://bihealth.github.io/bih-cluster/).
 
@@ -83,7 +83,7 @@ f. Go to https://zugang.charite.de/ and log in as normal. Click on the blue butt
 a. Type `ssh-add`  
 
 b. Go to the `$HOME/.ssh/` folder and create a new text file. paste the below in, adding your username and leaving the '_c', and save, *without* a file extension.  
-```bash
+```sh
 Host cubi
     ForwardAgent yes
     ForwardX11 yes
@@ -100,7 +100,7 @@ Host cubi2
 ```
 
 c. Then, you can simply type `ssh bihcluster``  
-Enter the password you set during **step 2** and connect into the login node. Proceed directly to the instructions in [Setting up your work environment](https://github.com/romagnanilab/bih-cubi/tree/main#setting-up-your-work-environment)
+Enter the password you set during **step 2** and connect into the login node. Proceed directly to the instructions in [Setting up your work environment](https://github.com/romagnanilab/bih-cubi-romagnani/tree/main#setting-up-your-work-environment)
 
 </details>
 
@@ -114,7 +114,7 @@ Upon connecting using the `ssh bihcluster` command, or through `Clusters -> _cub
 `tmux` is essentially a new window for your command line. You can attach and detach these and they will run in the background even when you close your terminal window.  
 
 To begin:
-```bash
+```sh
 tmux new -s cubi # create a new tmux session with the name 'cubi'
 ```
 
@@ -122,7 +122,7 @@ You can detach this at any time by pressing CTRL+b, letting go, and pressing the
 
 Next, we will ask the workload managing system `slurm` to allocate us some cores and RAM.
 
-```bash
+```sh
 srun --time 48:00:00 --ntasks 16 --mem 32G --immediate=10000 --pty bash -i
 ```  
 
@@ -148,13 +148,13 @@ Communal programs, scripts, and reference genomes/files are stored in `/data/cep
 
 Below is a set of instructions to install miniforge3, which is required to install Seurat and other R packages. However, you can skip this and hopefully run a command with this to get everything looking nice:
 
-```bash
+```sh
 bash /data/cephfs-2/unmirrored/groups/romagnani/work/bin/first_time_setup.sh
 ```
 
 Alternatively, you can do things step by step:  
 
-```bash
+```sh
 bin_folder=/data/cephfs-1/work/groups/romagnani/users/${USER}/bin
 mkdir $bin_folder && cd $bin_folder
 
@@ -190,7 +190,7 @@ conda create -y -n r-reticulate -c vtraag python-igraph pandas umap-learn scanpy
 
 An important part is to perform a simple fix, which might save you some headaches in the future:  
 
-```bash
+```sh
 mkdir -p ${bin_folder}/ondemand/dev
 cd ${bin_folder}/ondemand/dev
 git clone https://github.com/ollieeknight/ood-bih-rstudio-server
@@ -210,7 +210,7 @@ If at any point you come into errors installing packages through RStudio directl
 
 From here, you can customise the session you want:
 
-```bash
+```sh
 **R source:** change to miniforge  
 **miniforge path:** ~/work/bin/miniforge3/bin:R_4.3.3 # or whatever you named the environment to be
 **Apptainer image:** *leave as is*  
