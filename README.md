@@ -21,7 +21,7 @@ If you run into trouble using any part of the HPC, heres an order of where to lo
 # VPN access and requesting an account
 
 1. **Fill in both VPN forms, [`vpn_antrag.pdf`](https://github.com/romagnanilab/bih-cubi-romagnani/blob/main/files/01_VPN_antrag.pdf), and [`vpn_zusatzantrag_b.pdf`](https://github.com/romagnanilab/bih-cubi-romagnani/blob/main/files/02_VPN_zusatzantrag_B.pdf)**  
-Print and sign both, then scan and send both files to to *vpn@charite.de*, cc'ing Chiara (*chiara.romagnani@charite.de*).
+Print and sign both, then scan and send both files to to *vpn@charite.de*, cc'ing Chiara (*chiara.romagnani@charite.de*) and Ollie (oliver.knight@charite.de).
 
 2. **For personal computer access, install OpenVPN and configure your connection**  
 Refer to either installation on macOS ([`vpn_macOS_installation.pdf`](https://github.com/romagnanilab/bih-cubi-romagnani/blob/main/files/install_VPN_macOS.pdf)) or Windows ([`vpn_Windows_installation.pdf`](https://github.com/romagnanilab/bih-cubi-romagnani/blob/main/files/install_VPN_windows.pdf)) if you run into trouble.
@@ -33,17 +33,16 @@ If you have any issues, feel free to ask Ollie (*oliver.knight@charite.de*) for 
 Please fill in the form below and forwarded to Ollie, who is the named delegate for AG Romagnani with the cluster.
 
 ```
-- cluster: HPC 4 Research
 - first name:
 - last name:
 - affiliation: Charite, Institute of Medical Immunology
-- institute email: # charite e-mail
-- institute phone:
+- institute email:
+- institute phone: -
 - user has account with
     - [ ] BIH
     - [x] Charite
     - [ ] MDC
-- BIH/Charite/MDC user name:
+- Charite user name:
 - duration of cluster access (max 1 year): 1 year
 - AG: ag-romagnani
 ```
@@ -58,7 +57,7 @@ Go [here](https://hpc-portal.cubi.bihealth.org/pun/sys/dashboard/) here to log i
 ***a. DRFZ computer Windows login***  
 Login with your username in this format: `username@CHARITE`  
 
-***b. Work Mac or personal computer/laptop***  
+***b. Anything else***  
 Login with your Charite credentials, i.e. `username`
 
 <details>
@@ -74,7 +73,7 @@ d. Locate the `.ssh/id_rsa.pub` file in your file explorer and open with notepad
 
 e. Copy the contents; it should look something like  
 ```
-ssh-rsa AAAAAB3NzaC1yc2EAAAADAQABAAABAQC/Rdd5rf4BT38jsBrXpiZZlEmkB6809QK7hV6RCG13VcyPTIHSQePycfcUv5q1Jdy28MpacL/nv1UR/o35xPBn2HkgB4OqnKtt86soCGMd9/YzQP5lY7V60kPBJbrXDApeqf+H1GALsFNQM6MCwicdE6zTqE1mzWVdhGymZR28hGJbVsnMDDc0tW4i3FHGrDdmb7wHM9THMx6OcCrnNyA9Sh2OyBH4MwItKfuqEg2rc56D7WAQ2JcmPQZTlBAYeFL/dYYKcXmbffEpXTbYh+7O0o9RAJ7T3uOUj/2IbSnsgg6fyw0Kotcg8iHAPvb61bZGPOEWZb your_email@charite.de
+ssh-rsa AAAAAB3NzaC1yc2EAAAADAQABAAABAQC/Rdd5rf4BT38jsBrXpiZZlEmkB6809QK7hV6RCG13cyPTIHSQePycfcUv5q1Jdy28MpacL/nv1UR/o35xPBn2HkgB4OqnKtt86soCGMd9/YzQP5lY7V60kPBJbrXDApeqf+H1GALsFNQM6MCwicdE6zTqE1mzWVdhGymZR28hGJbVsnMDDc0tW4i3FHGrDdmb7wHM9THMx6OcCrnNyA9Sh2OyBH4MwItKfuqEg2rc56D7WAQ2JcmPQZTlBAYeFL/dYYKcXmbffEpXTbYh+7O0o9RAJ7T3uOUj/2IbSnsgg6fyw0Kotcg8iHAPvb61bZGPOEWZb your_email@charite.de
 ```
 
 f. Go to https://zugang.charite.de/ and log in as normal. Click on the blue button `SSHKeys...`, paste the key from your `.ssh/id_rsa.pub` file, and click append.  
@@ -82,7 +81,7 @@ f. Go to https://zugang.charite.de/ and log in as normal. Click on the blue butt
 **4. Connect to the cluster**  
 a. Type `ssh-add`  
 
-b. Go to the `$HOME/.ssh/` folder and create a new text file. paste the below in, adding your username and leaving the '_c', and save, *without* a file extension.  
+b. Go to the `$HOME/.ssh/` folder and create a new text file. paste the below in, **adding your username** and leaving the '_c', and save, *without* a file extension.  
 ```sh
 Host cubi
     ForwardAgent yes
@@ -111,7 +110,7 @@ Upon connecting using the `ssh bihcluster` command, or through `Clusters -> _cub
 
 **1. Creating an interactive session** 
 
-`tmux` is essentially a new window for your command line. You can attach and detach these and they will run in the background even when you close your terminal window.  
+`tmux` is essentially a new window for your command line, and it'll stay running if you exit the web page or terminal application. You can attach and detach these and they will run in the background even when you close your terminal window.  
 
 To begin:
 ```sh
@@ -123,10 +122,10 @@ You can detach this at any time by pressing CTRL+b, letting go, and pressing the
 Next, we will ask the workload managing system `slurm` to allocate us some cores and RAM.
 
 ```sh
-srun --time 48:00:00 --ntasks 16 --mem 32G --immediate=10000 --pty bash -i
+srun --time 48:00:00 --ntasks 8 --mem 32G --immediate=10000 --pty bash -i
 ```  
 
-This creates a session which will last 48h, allow you to use 16 CPU cores, and 32Gb RAM. From here, we can install software, packages, extract files and run programs.
+This creates a session which will last 48h, assign you 8 CPU cores, and 32Gb RAM. From here, we can install software, packages, extract files and run programs. Adjust as necessary for what you're running.
 
 **2. Setting up a workspace environment**
 
@@ -136,10 +135,10 @@ To set up your workspace on the BIH-CUBI cluster, follow the structure outlined 
 Your home directory is located at `/data/cephfs-1/home/users/$USER`. This space is limited to 1 GB and should only contain *links* to other folders. You can check your current location with the command `pwd`.
 
 ## Scratch Folder
-The scratch directory is at `/data/cephfs-1/home/users/$USER/scratch`, with a quota of 200 TB. Note that files are automatically deleted after 2 weeks from their creation date. This is where you should run large data sets, such as sequencing runs and processing pipelines.
+The scratch directory is at `/data/cephfs-1/home/users/$USER/scratch`, with a quota of 20 TB. Note that files are automatically deleted after 2 weeks from their creation date. This is where you should run large data sets, such as sequencing runs and processing pipelines.
 
 ## Work Folder
-Your work directory can be found at `/data/cephfs-1/home/users/$USER/work`, with a hard quota of 1 TB. This space is designated for non-group personal use.
+Your work directory can be found at `/data/cephfs-1/home/users/$USER/work`, with a hard quota of 1 TB _per group_. This space is designated for non-group personal use.
 
 ## Group Folder
 Communal programs, scripts, and reference genomes/files are stored in `/data/cephfs-1/home/groups/ag_romagnani/`.
@@ -169,6 +168,7 @@ nano ${HOME}/.condarc
 
 # copy and paste this into nano (CTRL+C here, right click to paste)
 channels:
+  - https://repo.prefix.dev/romitools
   - https://prefix.dev/conda-forge
   - https://prefix.dev/pytorch
   - https://prefix.dev/bioconda
