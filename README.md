@@ -1,89 +1,279 @@
-# BIH-CUBI HPC Guide
+# Romagnani Lab: HPC Cluster Guide
 
-The Romagnani lab uses the [Berlin Institute of Health-Core Bioinformatics Unit (BIH-CUBI) High Performance Computing (HPC) cluster](https://www.hpc.bihealth.org/) for computational work.
+The Romagnani lab uses the **BIH HPC cluster** for large analyses that would be too slow or impossible on a laptop. RStudio and JupyterLab run directly in your browser through a web portal.
 
-For RStudio and JupterLab access, go to the >> **[BIH Dashboard](https://hpc-portal.cubi.bihealth.org/pun/sys/dashboard/)** <<
+**Portal:** [hpc-portal.cubi.bihealth.org](https://hpc-portal.cubi.bihealth.org)
 
-If you run into trouble using any part of the HPC, heres an order of where to look for guidance:  
-1. The BIH-CUBI HPC [documents](https://bihealth.github.io/bih-cluster/)
-2. The BIH-CUBI HPC [question board](https://hpc-talk.cubi.bihealth.org/) for posting and helping with issues  
-3. Ollie (oliver.knight@charite.de)  
-4. The HPC helpdesk (hpc-helpdesk@bih-charite.de), explaining your problem according to [these guidelines](https://bihealth.github.io/bih-cluster/help/good-tickets/)  
+If you run into problems:
 
-# Contents
+1. [BIH HPC documentation](https://hpc-docs.cubi.bihealth.org/)
+2. [Community forum](https://hpc-talk.cubi.bihealth.org/)
+3. Ollie — [oliver.knight@charite.de](mailto:oliver.knight@charite.de)
+4. HPC helpdesk — [hpc-helpdesk@bih-charite.de](mailto:hpc-helpdesk@bih-charite.de)
 
-**[VPN access and requesting an account](https://github.com/ollieeknight/bih-cubi-romagnani?tab=readme-ov-file#vpn-access-and-requesting-an-account)**  
-**[Connecting to the cluster](https://github.com/ollieeknight/bih-cubi-romagnani?tab=readme-ov-file#connecting-to-the-cluster)**  
-**[Setting up your work environment](https://github.com/ollieeknight/bih-cubi-romagnani?tab=readme-ov-file#setting-up-your-work-environment)**  
-**[Setting up an RStudio session](https://github.com/ollieeknight/bih-cubi-romagnani?tab=readme-ov-file#setting-up-an-rstudio-session)**  
+---
 
+## Contents
 
-# VPN access and requesting an account
+1. [Before you start](#1-before-you-start)
+2. [Get VPN access](#2-get-vpn-access)
+3. [Request an HPC account](#3-request-an-hpc-account)
+4. [Log in to the portal](#4-log-in-to-the-portal)
+5. [One-time setup](#5-one-time-setup-run-this-once)
+6. [Using RStudio Server](#6-using-rstudio-server)
+7. [Using JupyterLab](#7-using-jupyterlab)
+8. [Your file storage](#8-your-file-storage)
+9. [Running longer analyses](#9-running-longer-analyses)
+10. [Connecting via terminal (optional)](#10-connecting-via-terminal-optional)
+11. [Getting help](#11-getting-help)
 
-1. **Fill in both VPN forms, [`vpn_antrag.pdf`](https://github.com/romagnanilab/bih-cubi-romagnani/blob/main/files/01_VPN_antrag.pdf), and [`vpn_zusatzantrag_b.pdf`](https://github.com/romagnanilab/bih-cubi-romagnani/blob/main/files/02_VPN_zusatzantrag_B.pdf)**  
-Print and sign both, then scan and send both files to to *vpn@charite.de*, cc'ing Chiara (*chiara.romagnani@charite.de*).
+---
 
-2. **For personal computer access, install OpenVPN and configure your connection**  
-Refer to either installation on macOS ([`vpn_macOS_installation.pdf`](https://github.com/romagnanilab/bih-cubi-romagnani/blob/main/files/install_VPN_macOS.pdf)) or Windows ([`vpn_Windows_installation.pdf`](https://github.com/romagnanilab/bih-cubi-romagnani/blob/main/files/install_VPN_windows.pdf)) if you run into trouble.
+## 1. Before you start
 
-If you have any issues, feel free to ask Ollie (*oliver.knight@charite.de*) for help. You can also check out the BIH-CUBI cluster guide [here](https://bihealth.github.io/bih-cluster/).
+You need:
 
-3. **Applying for an HPC user account**  
+- A **Charité computer account** (your normal Charité login)
+- **VPN access** if connecting from home or a personal computer — see step 2
 
-Please fill in the form below and forwarded to Ollie, who is the named delegate for AG Romagnani with the cluster.
+If you're using a DRFZ Windows computer on-site, you do not need VPN.
 
-```
+---
+
+## 2. Get VPN access
+
+### Step 1: Fill in and sign both forms
+
+- [`01_VPN_antrag.pdf`](files/01_VPN_antrag.pdf) — the standard VPN application
+- [`02_VPN_zusatzantrag_B.pdf`](files/02_VPN_zusatzantrag_B.pdf) — the supplementary form required for HPC access
+
+Print both, sign them, scan them, and email the scans to **vpn@charite.de**, cc'ing Chiara ([chiara.romagnani@charite.de](mailto:chiara.romagnani@charite.de)).
+
+### Step 2: Install OpenVPN
+
+After VPN approval, install the client and configure your connection:
+
+- macOS: [`install_VPN_macOS.pdf`](files/install_VPN_macOS.pdf)
+- Windows: [`install_VPN_windows.pdf`](files/install_VPN_windows.pdf)
+
+> VPN approval can take a few days. Submit the forms as early as possible.
+
+---
+
+## 3. Request an HPC account
+
+Send Ollie ([oliver.knight@charite.de](mailto:oliver.knight@charite.de)) a message with the following details. He will submit it to the CUBI team who will create your account.
+
+```text
 - cluster: HPC 4 Research
 - first name:
 - last name:
 - affiliation: Charite, Institute of Medical Immunology
-- institute email: # charite e-mail
+- institute email:
 - institute phone:
-- user has account with
-    - [ ] BIH
-    - [x] Charite
-    - [ ] MDC
-- BIH/Charite/MDC user name:
+- user has account with: Charite
+- Charite username:
 - duration of cluster access (max 1 year): 1 year
 - AG: ag-romagnani
 ```
 
-Ollie will then forward this to the CUBI team who will set up your account.
+Your username on the cluster will be your Charité username followed by `_c` — for example, `doej_c`.
 
-# Connecting to the cluster
+---
 
-**1. Login to the CUBI dashboard through your browser**   
+## 4. Log in to the portal
 
-Go [here](https://hpc-portal.cubi.bihealth.org/pun/sys/dashboard/) here to log in to access the Dashboard.  
-***a. DRFZ computer Windows login***  
-Login with your username in this format: `username@CHARITE`  
+Go to **[hpc-portal.cubi.bihealth.org](https://hpc-portal.cubi.bihealth.org)** in your browser.
 
-***b. Work Mac or personal computer/laptop***  
-Login with your Charite credentials, i.e. `username`
+> Requires Charité VPN or DRFZ on-site access.
+
+**DRFZ Windows computer:** Log in with `username@CHARITE`  
+**Mac or personal computer:** Log in with your Charité username (without `@CHARITE`)
+
+Once logged in you'll see the dashboard. From here you can launch RStudio, JupyterLab, open a terminal, manage files, and monitor running jobs.
+
+---
+
+## 5. One-time setup (run this once!)
+
+This script:
+
+- Creates folder shortcuts to prevent overfilling your 1 GB home directory
+- Installs Miniforge3 (for conda-based environments)
+- Installs pixi (environment manager used for RStudio and Jupyter)
+- Sets up an R 4.5.0 environment for RStudio
+- Sets up a Python/reticulate environment for R
+- Installs the RStudio and Jupyter portal apps into your account
+
+Steps:
+
+**1.** Log in to the portal and open a terminal: click **Clusters** in the top bar, then **\_cubi Shell Access**.
+
+**2.** Start an interactive compute session:
+
+```sh
+srun --time 4:00:00 --mem 8G --pty bash -i
+```
+
+Your prompt changes when ready.
+
+**3.** Run the setup script:
+
+```sh
+bash /data/cephfs-2/unmirrored/groups/romagnani/work/bin/first_time_setup.sh
+```
+
+**4.** Answer the prompts. For a new account, say **y** to everything. The R 4.5.0 pixi environment step will take 10–20 minutes.
+
+**5.** When it finishes, close the terminal tab and open a new one to apply the changes.
+
+---
+
+## 6. Using RStudio Server
+
+**1.** Go to the portal and click **Interactive Apps** in the top bar, then **RStudio Server (Sandbox)**.
+
+**2.** Fill in the form:
+
+| Setting | What to enter |
+| --- | --- |
+| R environment source | **Pixi environment** (recommended) |
+| Path to pixi project directory | `~/work/bin/pixi/R_4.5.0` |
+| Apptainer image | leave as-is |
+| Number of CPU cores | 8–16 (max 32) |
+| Memory (GB) | 32–64 (max 128) |
+| Running time | `1d` for most sessions, `3d` for longer analyses |
+| Partition | **medium** |
+
+**3.** Click **Launch**. The job will show as *Queued*, then *Starting*, then *Running*. Click **Connect to RStudio Server** when it's ready.
+
+> Smaller requests queue faster.
+
+### Installing R packages
+
+For packages available through pixi, use the terminal inside RStudio (Tools → Terminal → New Terminal):
+
+```sh
+pixi add r-packagename   # e.g. pixi add r-ggplot2
+```
+
+For packages from GitHub or Bioconductor, use R directly:
+
+```r
+remotes::install_github("author/package")
+BiocManager::install("PackageName")
+```
+
+### Using Python from R (reticulate)
+
+Add this at the top of your script:
+
+```r
+Sys.setenv(PATH = paste('~/work/bin/miniforge3/envs/r-reticulate/lib/python3.10/site-packages/', Sys.getenv()['PATH'], sep = ':'))
+library(reticulate)
+assignInNamespace('is_conda_python', function(x){ return(FALSE) }, ns = 'reticulate')
+use_condaenv('~/work/bin/miniforge3/envs/r-reticulate/', required = TRUE)
+```
+
+---
+
+## 7. Using JupyterLab
+
+**1.** Go to the portal and click **Interactive Apps**, then **Jupyter**.
+
+**2.** Fill in the form:
+
+| Setting | What to enter |
+| --- | --- |
+| Python environment source | **Pixi environment** (if you have a pixi Jupyter env) or **Conda environment** |
+| Path to pixi project directory | `~/work/bin/pixi/jupyter` |
+| Jupyter Lab/Notebook | **Jupyter Lab** (recommended) |
+| Working directory | leave blank to start in your home folder |
+| Number of CPU cores | 4–8 |
+| Memory (GB) | 16–32 |
+| Running time | `1d` |
+| Partition | **medium** |
+
+**3.** Click **Launch**, wait for status *Running*, then click **Connect to Jupyter**.
+
+---
+
+## 8. Your file storage
+
+**Your home directory has only 1 GB.** The setup script moves large cache folders elsewhere.
+
+| Location | Shortcut | Full path | What to put there | Size limit | Auto-deleted? |
+| --- | --- | --- | --- | --- | --- |
+| Home | `~/` | `/data/cephfs-1/home/users/<user>` | Symlinks only, config files | **1 GB** | No |
+| Work | `~/work/` | `/data/cephfs-1/work/groups/romagnani/users/<user>/work` | Software, personal data, scripts | 1 TB | No |
+| Scratch | `~/scratch/` | `/data/cephfs-1/scratch/groups/romagnani` | Temporary files, pipeline runs | 10 TB | **Yes — 14 days** |
+| Group | `~/group/` | `/data/cephfs-2/unmirrored/groups/romagnani` | Shared tools, reference genomes | — | No |
+| Share | `~/share/` | `/data/cephfs-2/unmirrored/projects/share` | Cross-project shared data | — | No |
+
+Rules of thumb:
+
+- Never save large files directly to `~/` — it will cause failures
+- Run pipelines and large datasets in `~/scratch/`, but files delete after 14 days
+- Finished results go in `~/work/`
+- Reference genomes and shared tools live in `~/group/`
+
+---
+
+## 9. Running longer analyses
+
+Use **tmux** for analyses longer than a few minutes; sessions survive browser closure.
+
+Start a tmux session:
+
+```sh
+tmux new -s work
+```
+
+Then start a compute session inside tmux:
+
+```sh
+srun --time 48:00:00 --ntasks 16 --mem 64G --pty bash -i
+```
+
+This requests 48 hours, 16 CPU cores, and 64 GB RAM. Adjust as needed.
+
+**Detach** (session keeps running): `Ctrl+b`, then `d`  
+**Re-attach:** `tmux a -t work`  
+**List sessions:** `tmux ls`
+
+For analyses running overnight or for days, use batch jobs with `sbatch`. See the [SLURM documentation](https://hpc-docs.cubi.bihealth.org/slurm/overview/) or ask Ollie.
+
+---
+
+## 10. Connecting via terminal (optional)
+
+Useful for file transfers and running pipelines directly.
 
 <details>
-  <summary>Optional - terminal connection</summary>
-    
-**2. Creating a secure shell (ssh) key**  
+<summary>Show terminal connection instructions</summary>
 
-a. In terminal, type `ssh-keygen -t rsa -C "your_email@charite.de"` # leaving the quotation marks, enter your e-mail.  
+### Step 1: Generate an SSH key
 
-c. Use the default location for storing your ssh key (press enter), and type a secure password in to store it.  
+Open a terminal on your computer and run:
 
-d. Locate the `.ssh/id_rsa.pub` file in your file explorer and open with notepad/textedit. You may need to enable the 'show hidden files and folders' setting in your control panel.  
-
-e. Copy the contents; it should look something like  
-```
-ssh-rsa AAAAAB3NzaC1yc2EAAAADAQABAAABAQC/Rdd5rf4BT38jsBrXpiZZlEmkB6809QK7hV6RCG13VcyPTIHSQePycfcUv5q1Jdy28MpacL/nv1UR/o35xPBn2HkgB4OqnKtt86soCGMd9/YzQP5lY7V60kPBJbrXDApeqf+H1GALsFNQM6MCwicdE6zTqE1mzWVdhGymZR28hGJbVsnMDDc0tW4i3FHGrDdmb7wHM9THMx6OcCrnNyA9Sh2OyBH4MwItKfuqEg2rc56D7WAQ2JcmPQZTlBAYeFL/dYYKcXmbffEpXTbYh+7O0o9RAJ7T3uOUj/2IbSnsgg6fyw0Kotcg8iHAPvb61bZGPOEWZb your_email@charite.de
-```
-
-f. Go to https://zugang.charite.de/ and log in as normal. Click on the blue button `SSHKeys...`, paste the key from your `.ssh/id_rsa.pub` file, and click append.  
-
-**4. Connect to the cluster**  
-a. Type `ssh-add`  
-
-b. Go to the `$HOME/.ssh/` folder and create a new text file. paste the below in, adding your username and leaving the '_c', and save, *without* a file extension.  
 ```sh
+ssh-keygen -t ed25519
+```
+
+Accept the default file location (press Enter). Set a strong passphrase.
+
+### Step 2: Register your key with Charité
+
+1. Find your public key file: `~/.ssh/id_ed25519.pub`
+2. Open it with a text editor and copy the contents
+3. Go to [zugang.charite.de](https://zugang.charite.de) and log in
+4. Click **SSH Keys**, paste your key, and click **Append**
+
+### Step 3: Create an SSH config shortcut
+
+Create (or edit) `~/.ssh/config` and add:
+
+```text
 Host cubi
     ForwardAgent yes
     ForwardX11 yes
@@ -99,142 +289,32 @@ Host cubi2
     RequestTTY yes
 ```
 
-c. Then, you can simply type `ssh bihcluster``  
-Enter the password you set during **step 2** and connect into the login node. Proceed directly to the instructions in [Setting up your work environment](https://github.com/romagnanilab/bih-cubi-romagnani/tree/main#setting-up-your-work-environment)
+Replace `username_c` with your Charité username followed by `_c`.
+
+### Step 4: Connect
+
+```sh
+ssh-add
+ssh cubi
+```
+
+> You land on a **login node** — do not run analyses here. Start a compute session with `srun` first.
+
+### Transferring files
+
+Use the transfer nodes (not the login nodes) for large file transfers:
+
+```sh
+scp localfile.txt username_c@hpc-transfer-1.cubi.bihealth.org:/data/cephfs-1/work/...
+```
 
 </details>
 
-# Setting up your work environment
+---
 
-Upon connecting using the `ssh bihcluster` command, or through `Clusters -> _cubi Shell Access` on the Dashboard, you'll find yourself in a login node.   
-**Do not** run anything here as there is limited RAM and CPU for anything, it is only intended for running `tmux` sessions.  
+## 11. Getting help
 
-**1. Creating an interactive session** 
-
-`tmux` is essentially a new window for your command line. You can attach and detach these and they will run in the background even when you close your terminal window.  
-
-To begin:
-```sh
-tmux new -s cubi # create a new tmux session with the name 'cubi'
-```
-
-You can detach this at any time by pressing CTRL+b, letting go, and pressing the d key. You can reattach at any time in 'base' command windows by typing `tmux a -t cubi`, or simply `tmux a` to attach your last accessed session. `tmux ls` lists your sessions.  
-
-Next, we will ask the workload managing system `slurm` to allocate us some cores and RAM.
-
-```sh
-srun --time 48:00:00 --ntasks 16 --mem 32G --immediate=10000 --pty bash -i
-```  
-
-This creates a session which will last 48h, allow you to use 16 CPU cores, and 32Gb RAM. From here, we can install software, packages, extract files and run programs.
-
-**2. Setting up a workspace environment**
-
-To set up your workspace on the BIH-CUBI cluster, follow the structure outlined below. The arrangement is designed for optimal organisation of your files and efficient use of available resources:
-
-## Home Directory
-Your home directory is located at `/data/cephfs-1/home/users/$USER`. This space is limited to 1 GB and should only contain *links* to other folders. You can check your current location with the command `pwd`.
-
-## Scratch Folder
-The scratch directory is at `/data/cephfs-1/home/users/$USER/scratch`, with a quota of 200 TB. Note that files are automatically deleted after 2 weeks from their creation date. This is where you should run large data sets, such as sequencing runs and processing pipelines.
-
-## Work Folder
-Your work directory can be found at `/data/cephfs-1/home/users/$USER/work`, with a hard quota of 1 TB. This space is designated for non-group personal use.
-
-## Group Folder
-Communal programs, scripts, and reference genomes/files are stored in `/data/cephfs-1/home/groups/ag_romagnani/`.
-
-## Setting up miniforge and RStudio environments - important!
-
-Below is a set of instructions to install miniforge3, which is required to install Seurat and other R packages. However, you can skip this and hopefully run a command with this to get everything looking nice:
-
-```sh
-bash /data/cephfs-2/unmirrored/groups/romagnani/work/bin/first_time_setup.sh
-```
-
-Alternatively, you can do things step by step:  
-
-```sh
-bin_folder=/data/cephfs-1/work/groups/romagnani/users/${USER}/bin
-mkdir $bin_folder && cd $bin_folder
-
-# download, install, and update miniforge 
-cd ${bin_folder}
-curl -L https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh -o Miniforge3-Linux-x86_64.sh
-bash Miniforge3-Linux-x86_64.sh -b -p ${bin_folder}/miniforge3/
-rm Miniforge3-Linux-x86_64.sh
-
-# modify conda repositories  
-nano ${HOME}/.condarc
-
-# copy and paste this into nano (CTRL+C here, right click to paste)
-channels:
-  - https://prefix.dev/conda-forge
-  - https://prefix.dev/pytorch
-  - https://prefix.dev/bioconda
-show_channel_urls: true
-changeps1: true
-channel_priority: strict
-
-# close by CTRL+X and y and enter
-
-conda upgrade --all -y
-echo "" >> ${HOME}/.bashrc
-echo "source ${bin_folder}/miniforge3/etc/profile.d/conda.sh" >> ${HOME}/.bashrc
-
-# If you'd like to make a conda env now for single cell analysis in R, run these steps:  
-conda create -y -n R_4.3.3 r-base r-tidyverse r-biocmanager r-hdf5r r-devtools r-r.utils r-seurat r-signac r-leiden r-matrix r-pals r-ggsci r-ggthemes r-showtext r-ggpubr r-ggridges r-ggtext r-ggh4x bioconductor-motifmatchr bioconductor-tfbstools bioconductor-chromvar bioconductor-bsgenome.hsapiens.ucsc.hg38 bioconductor-ensdb.hsapiens.v86 bioconductor-deseq2 bioconductor-limma r-harmony bioconductor-biocfilecache
-
-conda create -y -n r-reticulate -c vtraag python-igraph pandas umap-learn scanpy macs2
-```
-
-An important part is to perform a simple fix, which might save you some headaches in the future:  
-
-```sh
-mkdir -p ${bin_folder}/ondemand/dev
-cd ${bin_folder}/ondemand/dev
-git clone https://github.com/ollieeknight/ood-bih-rstudio-server
-
-sed -i "s/\${USER}/$USER/g" "ood-bih-rstudio-server/template/script.sh.erb"
-```
-
-In the above script, we make a folder called `bin` in your work directory, and then download and install miniforge. We then use it to create our R environment named `R_4.3.3`, but you can name this whatever you want.
-
-If at any point you come into errors installing packages through RStudio directly, try using this format while in the `R_4.3.3` conda environment: `conda install r-package`, replacing the word 'package' with what you want to install. The 'r-' prefix indicates it's an `R` package, and not a `python` one.
-
-# Setting up an RStudio session
-
-**1. Navigate to [this page](https://hpc-portal.cubi.bihealth.org/pun/sys/dashboard/).** You must be connected to the Charite VPN to access this page
-
-**2. In the top bar, go to `Interactive Apps` then the red `RStudio Server (Sandbox)`** button. It's important you choose the *Sandbox* RStudio server due to some ongoing package loading issues with the OnDemand platform
-
-From here, you can customise the session you want:
-
-```sh
-**R source:** change to miniforge  
-**miniforge path:** ~/work/bin/miniforge3/bin:R_4.3.3 # or whatever you named the environment to be
-**Apptainer image:** *leave as is*  
-**Number of cores:** Maximum 32
-**Memory [GiB]:** Maximum 128  
-**Running time [days]:** Maximum 14, recommended 1  
-**Partition to run in:** medium
-```
-
-When you launch this, it will queue the request as it goes through the `slurm` workload manager. It will then automatically update when it is running, and you can launch the session. If it is taking too long, reduce the cores, memory, and running time. 16 cores, 64 Gb RAM, and 1 day often works well.
-
-**5.** Finalising our R environment, we move back to ondemand, launch a session once more, and perform these steps:
-
-At the beginning of your script, you must let R know where your python environment is to use reticulate:
-
-```R
-Sys.setenv(PATH = paste('~/work/bin/miniforge3/envs/r-reticulate/lib/python3.10/site-packages/', Sys.getenv()['PATH'], sep = ':'))
-library(reticulate)
-assignInNamespace('is_conda_python', function(x){ return(FALSE) }, ns = 'reticulate')
-use_condaenv('~/work/bin/miniforge3/envs/r-reticulate/', required = T)
-```
-
-Then install some extra packages...
-
-```R
-remotes::install_github(c('satijalab/azimuth', 'satijalab/seurat-data', 'chris-mcginnis-ucsf/DoubletFinder', 'carmonalab/UCell', 'satijalab/seurat-wrappers', 'mojaveazure/seurat-disk'), force = T)
-```
+1. **BIH HPC documentation:** [hpc-docs.cubi.bihealth.org](https://hpc-docs.cubi.bihealth.org/)
+2. **Community forum:** [hpc-talk.cubi.bihealth.org](https://hpc-talk.cubi.bihealth.org/) — post questions, search past issues
+3. **Ollie:** [oliver.knight@charite.de](mailto:oliver.knight@charite.de)
+4. **HPC helpdesk:** [hpc-helpdesk@bih-charite.de](mailto:hpc-helpdesk@bih-charite.de) — for account issues, access problems, hardware faults
