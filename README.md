@@ -120,7 +120,7 @@ Your prompt changes when ready.
 **3.** Run the setup script:
 
 ```sh
-bash /data/cephfs-2/unmirrored/groups/romagnani/work/bin/first_time_setup.sh
+bash /data/cephfs-2/unmirrored/groups/romagnani/work/bin/bih-cubi-romagnani/first_time_setup.sh
 ```
 
 **4.** Answer the prompts. For a new account, say **y** to everything. The R 4.5.0 pixi environment step will take 10–20 minutes.
