@@ -36,8 +36,6 @@ You need:
 - A **Charité computer account** (your normal Charité login)
 - **VPN access** if connecting from home or a personal computer — see step 2
 
-If you're using a DRFZ Windows computer on-site, you do not need VPN.
-
 ---
 
 ## 2. Get VPN access
@@ -85,10 +83,9 @@ Your username on the cluster will be your Charité username followed by `_c` —
 
 Go to **[hpc-portal.cubi.bihealth.org](https://hpc-portal.cubi.bihealth.org)** in your browser.
 
-> Requires Charité VPN or DRFZ on-site access.
+> Requires Charité VPN.
 
-**DRFZ Windows computer:** Log in with `username@CHARITE`  
-**Mac or personal computer:** Log in with your Charité username (without `@CHARITE`)
+**Mac or personal computer:** Log in with your Charité username.
 
 Once logged in you'll see the dashboard. From here you can launch RStudio, JupyterLab, open a terminal, manage files, and monitor running jobs.
 
@@ -207,8 +204,8 @@ use_condaenv('~/work/bin/miniforge3/envs/r-reticulate/', required = TRUE)
 | Home | `~/` | `/data/cephfs-1/home/users/<user>` | Symlinks only, config files | **1 GB** | No |
 | Work | `~/work/` | `/data/cephfs-1/work/groups/romagnani/users/<user>/work` | Software, personal data, scripts | 1 TB | No |
 | Scratch | `~/scratch/` | `/data/cephfs-1/scratch/groups/romagnani` | Temporary files, pipeline runs | 10 TB | **Yes — 14 days** |
-| Group | `~/group/` | `/data/cephfs-2/unmirrored/groups/romagnani` | Shared tools, reference genomes | — | No |
-| Share | `~/share/` | `/data/cephfs-2/unmirrored/projects/share` | Cross-project shared data | — | No |
+| Group | `~/group/` | `/data/cephfs-2/unmirrored/groups/romagnani` | Shared tools, reference genomes | 10 TB | No |
+| Share | `~/share/` | `/data/cephfs-2/unmirrored/projects/share` | Cross-project shared data | 1 TB | No |
 
 Rules of thumb:
 
