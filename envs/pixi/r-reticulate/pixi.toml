@@ -1,0 +1,14 @@
+[workspace]
+authors = ["Oliver Knight <oliver.knight@charite.de>"]
+channels = ["conda-forge", "https://prefix.dev/conda-forge", "https://prefix.dev/pytorch", "https://prefix.dev/bioconda"]
+name = "r-reticulate"
+platforms = ["linux-64"]
+version = "0.1.0"
+
+[tasks]
+
+[dependencies]
+anndata = ">=0.12.19,<0.13"
+scanpy = ">=1.11.5,<2"
+macs2 = ">=2.2.9.1,<3"
+macs3 = ">=3.0.4,<4"

@@ -1,8 +1,17 @@
 #!/bin/bash
+#
+# Usage: first_time_setup.sh [--include-jupyter]
+#
+# --include-jupyter also offers the Jupyter single-cell pixi environment.
+# Off by default: it's a large environment and takes a while to install.
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+include_jupyter=false
+[[ "$1" == "--include-jupyter" ]] && include_jupyter=true
 
 cd "$HOME"
 
-TMPDIR=${TMPDIR:-/tmp}
 bin_folder="${HOME}/work/bin"
 mkdir -p "${bin_folder}"
 
@@ -42,71 +51,43 @@ manage_symlink() {
     fi
 }
 
+link_if_accessible() {
+    local target="$1"
+    local link_name="$2"
+    if [ -d "${target}" ]; then
+        ln -sf "${target}" "${HOME}/${link_name}"
+    else
+        echo -e "\033[0;33mWARNING:\033[0m ${target} isn't accessible yet — skipping ~/${link_name}. Ask Ollie if you need access." > /dev/tty
+    fi
+}
+
 create_symlinks() {
-    local links=(".config" ".celltypist" ".gsutil" ".ipython" ".java" ".jupyter" ".keras" ".local" ".ncbi" ".nv" ".nextflow" "ondemand" ".parallel")
+    # pixi and pip both cache packages in ~/.cache by default — .cache goes
+    # through the same work/bin symlink handling as everything else, keeping
+    # it off the 1 GB home quota.
+    local links=(".config" ".ipython" ".jupyter" ".local" ".ncbi" ".nv" ".nextflow" "ondemand" ".parallel" ".cache")
     for link in "${links[@]}"; do
         manage_symlink "$link"
     done
 
-    ln -sf /data/cephfs-2/unmirrored/projects/romagnani-share "${HOME}/share"
-    ln -sf /data/cephfs-2/unmirrored/groups/romagnani "${HOME}/group"
+    link_if_accessible "/data/cephfs-2/unmirrored/projects/romagnani-share" "share"
+    link_if_accessible "/data/cephfs-2/unmirrored/groups/romagnani" "group"
 
-    # Keep temp cache on scratch to avoid filling home quota
-    echo "" >> "${HOME}/.bashrc"
-    echo "mkdir -p ~/scratch/tmp/.cache" >> "${HOME}/.bashrc"
-}
-
-# ── Miniforge ──────────────────────────────────────────────────────────────────
-
-install_miniforge() {
-    [ -d "${bin_folder}/miniforge3/" ] && rm -rf "${bin_folder}/miniforge3/"
-    { [ -d "${HOME}/.conda" ] || [ -L "${HOME}/.conda" ]; } && rm -rf "${HOME}/.conda"
-
-    cd "${bin_folder}" || exit 1
-    curl -fsSL https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh \
-        -o Miniforge3-Linux-x86_64.sh > /dev/null 2>&1
-    bash Miniforge3-Linux-x86_64.sh -b -p "${bin_folder}/miniforge3/" > /dev/null
-    rm Miniforge3-Linux-x86_64.sh
-
-    cat <<EOF > "${HOME}/.condarc"
-channels:
-  - https://prefix.dev/conda-forge
-  - https://prefix.dev/pytorch
-  - https://prefix.dev/bioconda
-show_channel_urls: true
-changeps1: true
-channel_priority: strict
-EOF
-
-    source "${bin_folder}/miniforge3/etc/profile.d/conda.sh"
-
-    # Remove any stale conda init lines, add clean one
-    sed -i '/conda activate/d; /conda source/d; /source .*\.conda\.sh/d' "${HOME}/.bashrc"
-    echo "" >> "${HOME}/.bashrc"
-    echo "source ${bin_folder}/miniforge3/etc/profile.d/conda.sh" >> "${HOME}/.bashrc"
-
-    if [ ! -f "${HOME}/.Rprofile" ] || ! grep -q "options(download.file.method = 'wget')" "${HOME}/.Rprofile"; then
-        echo "options(download.file.method = 'wget')" >> "${HOME}/.Rprofile"
+    # Cluster best practice: point TMPDIR at scratch, not node-local /tmp
+    if ! grep -q "^export TMPDIR=" "${HOME}/.bashrc"; then
+        echo "" >> "${HOME}/.bashrc"
+        echo 'export TMPDIR=$HOME/scratch/tmp/$(hostname)' >> "${HOME}/.bashrc"
+        echo 'mkdir -p "$TMPDIR"' >> "${HOME}/.bashrc"
     fi
-
-    conda upgrade --all -y > /dev/null
-
-    mv "${HOME}/.conda" "${bin_folder}" && ln -sf "${bin_folder}/.conda" "${HOME}/.conda"
-
-    # Move cache off home quota
-    if [ -d "${HOME}/.cache" ] && [ ! -L "${HOME}/.cache" ]; then
-        mv "${HOME}/.cache" ~/scratch/tmp/ && ln -sf ~/scratch/tmp/.cache "${HOME}/.cache"
-    elif [ -L "${HOME}/.cache" ]; then
-        rm "${HOME}/.cache" && ln -sf ~/scratch/tmp/.cache "${HOME}/.cache"
-    fi
-
-    conda clean --all -y > /dev/null
-    pip cache purge > /dev/null 2>&1 || true
-
-    cd "$HOME"
 }
 
 # ── Pixi ───────────────────────────────────────────────────────────────────────
+
+require_pixi() {
+    command -v pixi &> /dev/null && return 0
+    echo -e "\033[0;31mERROR:\033[0m pixi not found. Install pixi first." > /dev/tty
+    return 1
+}
 
 install_pixi() {
     local pixi_home="${bin_folder}/pixi_bin"
@@ -122,88 +103,29 @@ install_pixi() {
     echo -e "pixi $("${pixi_home}/bin/pixi" --version) installed" > /dev/tty
 }
 
-# ── R 4.5.0 pixi environment ───────────────────────────────────────────────────
+# ── Pixi environments (defined in envs/pixi/<name>/, copied in and installed) ───
 
-create_rstudio_pixi_env() {
-    local pixi_dir="${bin_folder}/pixi/R_4.5.0"
-    mkdir -p "${pixi_dir}"
+install_pixi_env() {
+    local env_name="$1"
+    local pixi_source_dir="${SCRIPT_DIR}/envs/pixi/${env_name}"
+    local pixi_dest_dir="${bin_folder}/pixi/${env_name}"
 
-    cat <<'EOF' > "${pixi_dir}/pixi.toml"
-[workspace]
-authors = ["Oliver Knight <oliver.c.knight@gmail.com>"]
-name = "R_4.5.0"
-platforms = ["linux-64"]
-version = "0.1.0"
-channels = [
-  "https://prefix.dev/conda-forge",
-  "https://prefix.dev/pytorch",
-  "https://prefix.dev/bioconda"
-]
-
-[dependencies]
-r-base = ">=4.5,<4.6"
-r-renv = "*"
-gcc = "*"
-gxx = "*"
-gfortran = "*"
-cmake = "*"
-pkg-config = "*"
-libabseil = ">=20230125"
-openssl = ">=3"
-libcurl = "*"
-hdf5 = "1.12.*"
-udunits2 = "*"
-libgit2 = "*"
-libxml2 = "*"
-glib = "*"
-glpk = "*"
-geos = "*"
-proj = "*"
-libgdal-core = "*"
-zlib = "*"
-libblas = "*"
-liblapack = "*"
-boost = "*"
-gsl = "*"
-gmp = "*"
-pandoc = "*"
-cairo = ">=1.18.4,<2"
-pango = "*"
-fontconfig = "*"
-freetype = "*"
-expat = "*"
-zstd = "*"
-lz4-c = "*"
-xorg-libx11 = "*"
-xorg-libxt = "*"
-libmagic = "*"
-xz = ">=5.8.3,<6"
-xorg-xproto = ">=7.0.31,<8"
-
-[activation.env]
-S2_FORCE_BUNDLED_ABSEIL = "true"
-LD_LIBRARY_PATH = "$CONDA_PREFIX/lib"
-EOF
-
-    echo "Installing R 4.5.0 pixi environment — this may take 10-20 minutes..." > /dev/tty
-    cd "${pixi_dir}" && pixi install > /dev/null
-    echo "R 4.5.0 environment ready at ${pixi_dir}" > /dev/tty
-    cd "$HOME"
-}
-
-# ── Conda R environment (legacy/fallback) ──────────────────────────────────────
-
-create_rstudio_conda_env() {
-    local env_file="${HOME}/group/work/bin/source/R_4.3.3.yml"
-    local env_name="R_4.3.3"
-    conda env create -f "${env_file}" > /dev/null
-    if [ -d "${bin_folder}/miniforge3/envs/${env_name}/lib/R/library" ]; then
-        ln -sf "${bin_folder}/miniforge3/envs/${env_name}/lib/R/library" "${HOME}/R"
+    if [ ! -f "${pixi_source_dir}/pixi.toml" ]; then
+        echo -e "\033[0;31mERROR:\033[0m ${pixi_source_dir}/pixi.toml not found. Skipping ${env_name}." > /dev/tty
+        return 1
     fi
-}
 
-create_reticulate_env() {
-    conda env create -f "${HOME}/group/work/bin/source/r-reticulate.yml" > /dev/null
+    mkdir -p "${pixi_dest_dir}"
+    cp "${pixi_source_dir}/pixi.toml" "${pixi_dest_dir}/"
+    [ -f "${pixi_source_dir}/pixi.lock" ] && cp "${pixi_source_dir}/pixi.lock" "${pixi_dest_dir}/"
+
+    echo "Installing pixi environment '${env_name}' — this may take a while..." > /dev/tty
+    if (cd "${pixi_dest_dir}" && pixi install --locked > /dev/null); then
+        echo "${env_name} environment ready at ${pixi_dest_dir}" > /dev/tty
+    else
+        echo -e "\033[0;31mERROR:\033[0m pixi install failed for '${env_name}'. Re-run the script to retry." > /dev/tty
+    fi
+    cd "$HOME"
 }
 
 # ── OOD apps ───────────────────────────────────────────────────────────────────
@@ -234,12 +156,6 @@ if [[ "$choice" =~ ^[Yy]$ ]]; then
     create_symlinks
 fi
 
-choice=$(prompt_user "Install Miniforge3 (needed for conda environments)?")
-if [[ "$choice" =~ ^[Yy]$ ]]; then
-    echo "Installing Miniforge3..." > /dev/tty
-    install_miniforge
-fi
-
 choice=$(prompt_user "Install pixi (recommended for RStudio and Jupyter on the portal)?")
 if [[ "$choice" =~ ^[Yy]$ ]]; then
     echo "Installing pixi..." > /dev/tty
@@ -247,31 +163,19 @@ if [[ "$choice" =~ ^[Yy]$ ]]; then
 fi
 
 choice=$(prompt_user "Set up R 4.5.0 environment via pixi (recommended for RStudio)?")
-if [[ "$choice" =~ ^[Yy]$ ]]; then
-    if command -v pixi &> /dev/null; then
-        create_rstudio_pixi_env
-    else
-        echo -e "\033[0;31mERROR:\033[0m pixi not found. Install pixi first." > /dev/tty
-    fi
+if [[ "$choice" =~ ^[Yy]$ ]] && require_pixi; then
+    install_pixi_env "R_4.5.0"
 fi
 
-choice=$(prompt_user "Set up R 4.3.3 conda environment (legacy, optional)?")
-if [[ "$choice" =~ ^[Yy]$ ]]; then
-    if command -v conda &> /dev/null; then
-        echo "Creating R 4.3.3 conda environment..." > /dev/tty
-        create_rstudio_conda_env
-    else
-        echo -e "\033[0;31mERROR:\033[0m conda not found. Install Miniforge3 first." > /dev/tty
-    fi
+choice=$(prompt_user "Set up reticulate Python environment via pixi (for R-Python interop)?")
+if [[ "$choice" =~ ^[Yy]$ ]] && require_pixi; then
+    install_pixi_env "r-reticulate"
 fi
 
-choice=$(prompt_user "Set up reticulate Python environment (for R-Python interop)?")
-if [[ "$choice" =~ ^[Yy]$ ]]; then
-    if command -v conda &> /dev/null; then
-        echo "Creating reticulate environment..." > /dev/tty
-        create_reticulate_env
-    else
-        echo -e "\033[0;31mERROR:\033[0m conda not found. Install Miniforge3 first." > /dev/tty
+if [[ "$include_jupyter" == true ]]; then
+    choice=$(prompt_user "Set up Jupyter single-cell environment via pixi (large, GPU/torch)?")
+    if [[ "$choice" =~ ^[Yy]$ ]] && require_pixi; then
+        install_pixi_env "jupyter"
     fi
 fi
 
@@ -282,3 +186,6 @@ fi
 
 echo "" > /dev/tty
 echo -e "\033[0;32mSetup complete!\033[0m Re-open your terminal (or run: source ~/.bashrc) to apply PATH changes." > /dev/tty
+if [[ "$include_jupyter" == false ]]; then
+    echo "Skipped the Jupyter single-cell environment. Re-run with --include-jupyter to add it." > /dev/tty
+fi

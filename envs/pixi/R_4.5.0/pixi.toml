@@ -1,0 +1,58 @@
+[workspace]
+authors = ["Oliver Knight <oliver.knight@charite.de>"]
+name = "R_4.5.0"
+platforms = ["linux-64"]
+version = "0.1.0"
+channels = [
+  "https://prefix.dev/conda-forge",
+  "https://prefix.dev/pytorch",
+  "https://prefix.dev/bioconda"
+]
+
+[dependencies]
+r-base = ">=4.5,<4.6"
+r-renv = "*"
+gcc = "*"
+gxx = "*"
+gfortran = "*"
+cmake = "*"
+pkg-config = "*"
+libabseil = ">=20230125"
+openssl = ">=3"
+libcurl = "*"
+hdf5 = "1.12.*"
+udunits2 = "*"
+libgit2 = "*"
+libxml2 = "*"
+glib = "*"
+glpk = "*"
+geos = "*"
+proj = "*"
+libgdal-core = "*"
+zlib = "*"
+libblas = "*"
+liblapack = "*"
+boost = "*"
+gsl = "*"
+gmp = "*"
+pandoc = "*"
+cairo = ">=1.18.4,<2"
+pango = "*"
+fontconfig = "*"
+freetype = "*"
+expat = "*"
+zstd = "*"
+lz4-c = "*"
+xorg-libx11 = "*"
+xorg-libxt = "*"
+libmagic = "*"
+xz = ">=5.8.3,<6"
+xorg-xproto = ">=7.0.31,<8"
+r-qs = ">=0.27.3,<0.28"
+r-arrow = ">=24.0.0,<25"
+rust = ">=1.97.1,<1.98"
+imagemagick = ">=7.1.2_24,<8"
+
+[activation.env]
+S2_FORCE_BUNDLED_ABSEIL = "true"
+LD_LIBRARY_PATH = "$CONDA_PREFIX/lib"

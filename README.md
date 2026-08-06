@@ -42,8 +42,8 @@ You need:
 
 ### Step 1: Fill in and sign both forms
 
-- [`01_VPN_antrag.pdf`](files/01_VPN_antrag.pdf) — the standard VPN application
-- [`02_VPN_zusatzantrag_B.pdf`](files/02_VPN_zusatzantrag_B.pdf) — the supplementary form required for HPC access
+- [`01_VPN_antrag.pdf`](vpn/01_VPN_antrag.pdf) — the standard VPN application
+- [`02_VPN_zusatzantrag_B.pdf`](vpn/02_VPN_zusatzantrag_B.pdf) — the supplementary form required for HPC access
 
 Print both, sign them, scan them, and email the scans to **vpn@charite.de**, cc'ing Chiara ([chiara.romagnani@charite.de](mailto:chiara.romagnani@charite.de)).
 
@@ -51,8 +51,8 @@ Print both, sign them, scan them, and email the scans to **vpn@charite.de**, cc'
 
 After VPN approval, install the client and configure your connection:
 
-- macOS: [`install_VPN_macOS.pdf`](files/install_VPN_macOS.pdf)
-- Windows: [`install_VPN_windows.pdf`](files/install_VPN_windows.pdf)
+- macOS: [`install_VPN_macOS.pdf`](vpn/install_VPN_macOS.pdf)
+- Windows: [`install_VPN_windows.pdf`](vpn/install_VPN_windows.pdf)
 
 > VPN approval can take a few days. Submit the forms as early as possible.
 
@@ -96,10 +96,10 @@ Once logged in you'll see the dashboard. From here you can launch RStudio, Jupyt
 This script:
 
 - Creates folder shortcuts to prevent overfilling your 1 GB home directory
-- Installs Miniforge3 (for conda-based environments)
 - Installs pixi (environment manager used for RStudio and Jupyter)
-- Sets up an R 4.5.0 environment for RStudio
-- Sets up a Python/reticulate environment for R
+- Sets up an R 4.5.0 pixi environment for RStudio
+- Sets up a reticulate pixi environment (Python from R)
+- Optionally sets up a single-cell Jupyter pixi environment (scanpy, scvi-tools, GPU/torch)
 - Installs the RStudio and Jupyter portal apps into your account
 
 Steps:
@@ -120,7 +120,13 @@ Your prompt changes when ready.
 bash /data/cephfs-2/unmirrored/groups/romagnani/work/bin/bih-cubi-romagnani/first_time_setup.sh
 ```
 
-**4.** Answer the prompts. For a new account, say **y** to everything. The R 4.5.0 pixi environment step will take 10–20 minutes.
+If you also want the Jupyter single-cell environment (large, GPU/torch — worth skipping unless you use JupyterLab), add the flag:
+
+```sh
+bash /data/cephfs-2/unmirrored/groups/romagnani/work/bin/bih-cubi-romagnani/first_time_setup.sh --include-jupyter
+```
+
+**4.** Answer the prompts. For a new account, say **y** to everything offered. The R 4.5.0 pixi environment step will take 10–20 minutes; the Jupyter environment (if included) considerably longer.
 
 **5.** When it finishes, close the terminal tab and open a new one to apply the changes.
 
@@ -166,10 +172,8 @@ BiocManager::install("PackageName")
 Add this at the top of your script:
 
 ```r
-Sys.setenv(PATH = paste('~/work/bin/miniforge3/envs/r-reticulate/lib/python3.10/site-packages/', Sys.getenv()['PATH'], sep = ':'))
 library(reticulate)
-assignInNamespace('is_conda_python', function(x){ return(FALSE) }, ns = 'reticulate')
-use_condaenv('~/work/bin/miniforge3/envs/r-reticulate/', required = TRUE)
+use_python('~/work/bin/pixi/r-reticulate/.pixi/envs/default/bin/python', required = TRUE)
 ```
 
 ---
@@ -182,7 +186,7 @@ use_condaenv('~/work/bin/miniforge3/envs/r-reticulate/', required = TRUE)
 
 | Setting | What to enter |
 | --- | --- |
-| Python environment source | **Pixi environment** (if you have a pixi Jupyter env) or **Conda environment** |
+| Python environment source | **Pixi environment** (recommended) |
 | Path to pixi project directory | `~/work/bin/pixi/jupyter` |
 | Jupyter Lab/Notebook | **Jupyter Lab** (recommended) |
 | Working directory | leave blank to start in your home folder |
@@ -213,6 +217,14 @@ Rules of thumb:
 - Run pipelines and large datasets in `~/scratch/`, but files delete after 14 days
 - Finished results go in `~/work/`
 - Reference genomes and shared tools live in `~/group/`
+
+Since August 2026, the scratch cleanup also removes **empty directories** that haven't been touched in 14 days (not just files). If you have a folder structure in `~/scratch/` you want to keep even when temporarily empty (e.g. a pipeline's output directory between runs), protect it with:
+
+```sh
+touch ~/scratch/path/to/folder/.keepdir
+```
+
+This only stops the *folder* being deleted — files inside it still follow the normal 14-day rule.
 
 ---
 
