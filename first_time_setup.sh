@@ -10,7 +10,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 include_jupyter=false
 [[ "$1" == "--include-jupyter" ]] && include_jupyter=true
 
-cd "$HOME"
+cd "$HOME" || exit 1
 
 bin_folder="${HOME}/work/bin"
 mkdir -p "${bin_folder}"
@@ -125,7 +125,7 @@ install_pixi_env() {
     else
         echo -e "\033[0;31mERROR:\033[0m pixi install failed for '${env_name}'. Re-run the script to retry." > /dev/tty
     fi
-    cd "$HOME"
+    cd "$HOME" || exit 1
 }
 
 # ── OOD apps ───────────────────────────────────────────────────────────────────
@@ -141,11 +141,11 @@ clone_ood_apps() {
             git -C "${dev_dir}/${repo}" pull --quiet
         else
             echo "Cloning ${repo}..." > /dev/tty
-            git clone --quiet "https://github.com/ollieeknight/${repo}"
+            git clone --quiet "https://github.com/Romagnani-Lab/${repo}"
         fi
     done
 
-    cd "$HOME"
+    cd "$HOME" || exit 1
 }
 
 # ── Main ───────────────────────────────────────────────────────────────────────

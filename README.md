@@ -1,6 +1,8 @@
 # Romagnani Lab: HPC Cluster Guide
 
-The Romagnani lab uses the **BIH HPC cluster** for large analyses that would be too slow or impossible on a laptop. RStudio and JupyterLab run directly in your browser through a web portal.
+> Last verified against the HPC portal: 2026-08-27
+
+The Romagnani lab uses the **BIH HPC cluster** for large analyses that would be too slow or impossible on a laptop. RStudio and JupyterLab run directly in your browser through a web portal. If you've never used a cluster before, this guide takes you through it from the very start.
 
 **Portal:** [hpc-portal.cubi.bihealth.org](https://hpc-portal.cubi.bihealth.org)
 
@@ -8,7 +10,7 @@ If you run into problems:
 
 1. [BIH HPC documentation](https://hpc-docs.cubi.bihealth.org/)
 2. [Community forum](https://hpc-talk.cubi.bihealth.org/)
-3. Ollie — [oliver.knight@charite.de](mailto:oliver.knight@charite.de)
+3. Email Ollie — [oliver.knight@charite.de](mailto:oliver.knight@charite.de)
 4. HPC helpdesk — [hpc-helpdesk@bih-charite.de](mailto:hpc-helpdesk@bih-charite.de)
 
 ---
@@ -25,7 +27,8 @@ If you run into problems:
 8. [Your file storage](#8-your-file-storage)
 9. [Running longer analyses](#9-running-longer-analyses)
 10. [Connecting via terminal (optional)](#10-connecting-via-terminal-optional)
-11. [Getting help](#11-getting-help)
+11. [Troubleshooting](#11-troubleshooting)
+12. [Getting help](#12-getting-help)
 
 ---
 
@@ -60,18 +63,15 @@ After VPN approval, install the client and configure your connection:
 
 ## 3. Request an HPC account
 
-Send Ollie ([oliver.knight@charite.de](mailto:oliver.knight@charite.de)) a message with the following details. He will submit it to the CUBI team who will create your account.
+Send Ollie ([oliver.knight@charite.de](mailto:oliver.knight@charite.de)) a message with the following details, who will submit it to the CUBI team where your account is set up.
 
 ```text
-- cluster: HPC 4 Research
 - first name:
 - last name:
 - affiliation: Charite, Institute of Medical Immunology
 - institute email:
-- institute phone:
 - user has account with: Charite
 - Charite username:
-- duration of cluster access (max 1 year): 1 year
 - AG: ag-romagnani
 ```
 
@@ -213,7 +213,7 @@ use_python('~/work/bin/pixi/r-reticulate/.pixi/envs/default/bin/python', require
 
 Rules of thumb:
 
-- Never save large files directly to `~/` — it will cause failures
+- Avoid saving large files directly to `~/` — with only 1 GB to work with, it fills up fast and things start failing
 - Run pipelines and large datasets in `~/scratch/`, but files delete after 14 days
 - Finished results go in `~/work/`
 - Reference genomes and shared tools live in `~/group/`
@@ -250,7 +250,7 @@ This requests 48 hours, 16 CPU cores, and 64 GB RAM. Adjust as needed.
 **Re-attach:** `tmux a -t work`  
 **List sessions:** `tmux ls`
 
-For analyses running overnight or for days, use batch jobs with `sbatch`. See the [SLURM documentation](https://hpc-docs.cubi.bihealth.org/slurm/overview/) or ask Ollie.
+For analyses running overnight or for days, use batch jobs with `sbatch`. See the [SLURM documentation](https://hpc-docs.cubi.bihealth.org/slurm/overview/), or just ask me.
 
 ---
 
@@ -307,7 +307,7 @@ ssh-add
 ssh cubi
 ```
 
-> You land on a **login node** — do not run analyses here. Start a compute session with `srun` first.
+> You'll land on a **login node** — this is shared with everyone else on the cluster, so please don't run analyses directly here. Start a compute session with `srun` first.
 
 ### Transferring files
 
@@ -321,7 +321,26 @@ scp localfile.txt username_c@hpc-transfer-1.cubi.bihealth.org:/data/cephfs-1/wor
 
 ---
 
-## 11. Getting help
+## 11. Troubleshooting
+
+**Portal won't load, or hangs on login.**
+Check you're connected to Charité VPN (step 2); the portal is only reachable over it, even on-site in some buildings.
+
+**`ssh cubi` fails with `Permission denied (publickey)`.**
+Your key isn't registered yet, or hasn't propagated. Confirm it's pasted correctly at [zugang.charite.de](https://zugang.charite.de) → SSH Keys, then wait a few minutes and retry.
+
+**`srun` hangs in `PENDING`.**
+The partition is busy. Try a smaller request (fewer cores/memory), a shorter `--time`, or wait — check queue state with `squeue --me`.
+
+**One-time setup script reports `pixi install failed`.**
+Transient — network hiccup or a slow mirror. Just re-run the same command; it's safe to run repeatedly and skips what's already installed.
+
+**`No space left on device`, or writes failing in your home directory.**
+You're saving large files to `~/` directly. Move them to `~/work/` (persistent) or `~/scratch/` (14-day auto-delete) — see [file storage](#8-your-file-storage).
+
+---
+
+## 12. Getting help
 
 1. **BIH HPC documentation:** [hpc-docs.cubi.bihealth.org](https://hpc-docs.cubi.bihealth.org/)
 2. **Community forum:** [hpc-talk.cubi.bihealth.org](https://hpc-talk.cubi.bihealth.org/) — post questions, search past issues
